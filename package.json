@@ -1,0 +1,42 @@
+{
+  "name": "force-compare",
+  "version": "1.0.0",
+  "description": "",
+  "unpkg": "dist/force-compare.min.js",
+  "main": "dist/force-compare.common.js",
+  "module": "dist/force-compare.module.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && rollup -c",
+    "dev": "rollup -c -w",
+    "minify": "terser dist/force-compare.js -o dist/force-compare.min.js -c -m --comments '/Version/'",
+    "build-module": "rollup -c rollup.config.module.js",
+    "prepare": "npm run build && npm run minify && npm run build-module",
+    "update@check": "ncu",
+    "update": "ncu -u"
+  },
+  "files": [
+    "dist/**/*",
+    "public/**/*",
+    "src/**/*"
+  ],
+  "dependencies": {
+    "@tweenjs/tween.js": "^18.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "npm-check-updates": "^6.0.1",
+    "postcss-nested": "^4.2.1",
+    "postcss-simple-vars": "^5.0.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.10.5",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-postcss": "^3.1.1",
+    "terser": "^4.7.0"
+  }
+}
