@@ -14,7 +14,7 @@ function init({ props }) {
     data = dataJson[props.dataName];
     options = props;
     const container = d3.selection(containerDom);
-    svg = container.select('svg')
+    svg = container.append('svg')
         .attr('width', boxSizing.width)
         .attr('height', boxSizing.height);
 
@@ -55,16 +55,6 @@ function getRandomColor(id) {
 }
 
 function render() {
-    const node = svg.append('g')
-        .selectAll('circle')
-        .data(data.nodes)
-        .enter()
-        .append('circle')
-        .attr('r', radius)
-        .attr('fill', d => getRandomColor(d.id))
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y);
-    
     const path = svg.append('g')
         .selectAll('line')
         .data(data.links)
@@ -76,6 +66,15 @@ function render() {
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
+    const node = svg.append('g')
+        .selectAll('circle')
+        .data(data.nodes)
+        .enter()
+        .append('circle')
+        .attr('r', radius)
+        .attr('fill', d => getRandomColor(d.id))
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y);
 }
 
 export default init;
