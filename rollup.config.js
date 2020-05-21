@@ -1,5 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonJs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import postCss from 'rollup-plugin-postcss';
 import postCssSimpleVars from 'postcss-simple-vars';
 import postCssNested from 'postcss-nested';
@@ -25,6 +26,7 @@ export default {
     }),
     babel({ exclude: 'node_modules/**' }),
     resolve(),
-    commonJs()
+    commonJs(),
+    json(),
   ]
 };
