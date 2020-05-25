@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import postCss from 'rollup-plugin-postcss';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import postCssSimpleVars from 'postcss-simple-vars';
 import postCssNested from 'postcss-nested';
 import babel from 'rollup-plugin-babel';
@@ -14,16 +15,17 @@ export default {
       format: 'umd',
       name: 'ForceCompare',
       file: `dist/${name}.js`,
-      sourcemap: true
-    }
+      sourcemap: false ,
+    },
   ],
   plugins: [
     postCss({
       plugins: [
         postCssSimpleVars(),
-        postCssNested()
+        postCssNested(),
       ]
     }),
+    webWorkerLoader(/* configuration */),
     babel({ exclude: 'node_modules/**' }),
     resolve(),
     commonJs(),

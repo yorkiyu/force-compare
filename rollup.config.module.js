@@ -1,6 +1,7 @@
 import postCss from 'rollup-plugin-postcss';
 import postCssSimpleVars from 'postcss-simple-vars';
 import postCssNested from 'postcss-nested';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import json from '@rollup/plugin-json';
 import babel from 'rollup-plugin-babel';
 import { name, dependencies } from './package.json';
@@ -22,9 +23,10 @@ export default {
     postCss({
       plugins: [
         postCssSimpleVars(),
-        postCssNested()
+        postCssNested(),
       ]
     }),
+    webWorkerLoader(/* configuration */),
     babel(),
     json()
   ]
