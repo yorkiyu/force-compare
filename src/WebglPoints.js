@@ -79,22 +79,23 @@ function initBasicMesh() {
     forceNodes.nodes = cloneDeep(data.nodes);
     forceNodes.positions = new Float32Array(data.nodes.length * 3);
     forceNodes.scale = new Float32Array(data.nodes.length);
-    data.nodes.forEach((e, i) => {
+    forceNodes.nodes.forEach((e, i) => {
         forceNodes.positions[i * 3] = -9999;
         forceNodes.positions[i * 3 + 1] = -9999;
         forceNodes.positions[i * 3 + 2] = 0;
         forceNodes.scale[i] = 1;
     });
-    forceNodes.material = new THREE.PointsMaterial({color: 0x888888, size: radius});
+    forceNodes.material = new THREE.PointsMaterial({color: 0x888888, size: radius *  2});
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
     forceNodes.geometry.setAttribute('scale', new THREE.BufferAttribute(forceNodes.scale, 1));
+    forceNodes.geometry.attributes.position.needsUpdate = true
     forceNodes.geometry.computeBoundingSphere();
     forceNodes.mesh = new THREE.Points(forceNodes.geometry, forceNodes.material);
     forceNodes.mesh.name = 'nodes';
     scene.add(forceNodes.mesh);
 
     forceLinks.geometry = new THREE.BufferGeometry();
-    forceLinks.positions = new Float32Array(data.links * 6);
+    forceLinks.positions = new Float32Array(data.links.length * 6);
     forceLinks.links = cloneDeep(data.links);
     forceLinks.material = new THREE.LineBasicMaterial({
         color: PathStrok,
@@ -108,7 +109,8 @@ function initBasicMesh() {
         forceLinks.positions[i * 6 + 4] = -9999;
         forceLinks.positions[i * 6 + 5] = -0.001;
     });
-    forceLinks.geometry.addAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
+    forceLinks.geometry.setAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
+    forceLinks.geometry.attributes.position.needsUpdate = true
     forceLinks.geometry.computeBoundingSphere()
     
     forceLinks.mesh = new THREE.LineSegments(forceLinks.geometry, forceLinks.material)
@@ -153,7 +155,27 @@ function start() {
 }
 
 function ticked() {
-    console.log(forceNodes, forceLinks);
+    forceNodes.nodes.forEach((e, i) => {
+        forceNodes.positions[i * 3] = e.x;
+        forceNodes.positions[i * 3 + 1] = e.y;
+        forceNodes.positions[i * 3 + 2] = 0;
+        forceNodes.scale[i] = 1;
+    });
+    forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
+    forceNodes.geometry.attributes.position.needsUpdate = true
+    forceNodes.geometry.computeBoundingSphere();
+    forceLinks.links.forEach((e, i) => {
+        forceLinks.positions[i * 6] = e.source.x;
+        forceLinks.positions[i * 6 + 1] = e.source.y;
+        forceLinks.positions[i * 6 + 2] = -0.001;
+        forceLinks.positions[i * 6 + 3] = e.target.x;
+        forceLinks.positions[i * 6 + 4] = e.target.y;
+        forceLinks.positions[i * 6 + 5] = -0.001;
+    });
+    forceLinks.geometry.setAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
+    forceLinks.geometry.attributes.position.needsUpdate = true
+    forceLinks.geometry.computeBoundingSphere();
+    renderer.render(scene, camera);
 }
 
 function installControls () {

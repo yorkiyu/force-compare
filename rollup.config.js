@@ -8,27 +8,79 @@ import postCssNested from 'postcss-nested';
 import babel from 'rollup-plugin-babel';
 import { name, homepage, version } from './package.json';
 
-export default {
-  input: 'src/index.js',
-  output: [
-    {
-      format: 'umd',
-      name: 'ForceCompare',
-      file: `dist/${name}.js`,
-      sourcemap: false ,
-    },
-  ],
-  plugins: [
-    postCss({
-      plugins: [
-        postCssSimpleVars(),
-        postCssNested(),
-      ]
-    }),
-    webWorkerLoader(/* configuration */),
-    babel({ exclude: 'node_modules/**' }),
-    resolve(),
-    commonJs(),
-    json(),
-  ]
-};
+const plugins = [
+  postCss({
+    plugins: [
+      postCssSimpleVars(),
+      postCssNested(),
+    ]
+  }),
+  webWorkerLoader(/* configuration */),
+  babel({ exclude: 'node_modules/**' }),
+  resolve(),
+  commonJs(),
+  json(),
+];
+
+export default [
+  {
+    input: 'src/Svg.js',
+    output: [
+      {
+        format: 'umd',
+        name: 'ForceSvg',
+        file: `dist/ForceSvg.js`,
+        sourcemap: false ,
+      },
+    ],
+    plugins,
+  },
+  {
+    input: 'src/Canvas.js',
+    output: [
+      {
+        format: 'umd',
+        name: 'ForceCanvas',
+        file: `dist/ForceCanvas.js`,
+        sourcemap: false ,
+      },
+    ],
+    plugins,
+  },
+  {
+    input: 'src/Webgl.js',
+    output: [
+      {
+        format: 'umd',
+        name: 'ForceWebgl',
+        file: `dist/ForceWebgl.js`,
+        sourcemap: false ,
+      },
+    ],
+    plugins,
+  },
+  {
+    input: 'src/CanvasWorker.js',
+    output: [
+      {
+        format: 'umd',
+        name: 'ForceCanvasWorker',
+        file: `dist/ForceCanvasWorker.js`,
+        sourcemap: false ,
+      },
+    ],
+    plugins,
+  },
+  {
+    input: 'src/WebglPoints.js',
+    output: [
+      {
+        format: 'umd',
+        name: 'ForceWebglPoints',
+        file: `dist/ForceWebglPoints.js`,
+        sourcemap: false ,
+      },
+    ],
+    plugins
+  }
+];
