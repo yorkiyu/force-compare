@@ -90,7 +90,6 @@ function initBasicMesh() {
         color.toArray(forceNodes.colors, i * 3);
         forceNodes.sizes[i] = radius * 2;
     });
-    console.log(forceNodes);
     // forceNodes.material = new THREE.PointsMaterial({vertexColors: true, size: radius *  2});
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
     forceNodes.geometry.setAttribute('ca', new THREE.BufferAttribute(forceNodes.colors, 3));
@@ -99,14 +98,15 @@ function initBasicMesh() {
     forceNodes.texture = new THREE.TextureLoader().load(nodeImage);
     forceNodes.texture.wrapS = THREE.RepeatWrapping;
     forceNodes.texture.wrapT = THREE.RepeatWrapping; 
-    forceNodes.material = new THREE.ShaderMaterial( {
+    forceNodes.material = new THREE.ShaderMaterial({
         uniforms: {
             color: { value: new THREE.Color( 0xffffff ) },
             pointTexture: { value: forceNodes.texture }
         },
         vertexShader: document.getElementById('vertexshader').textContent,
         fragmentShader: document.getElementById('fragmentshader').textContent,
-        transparent: true
+        transparent: true,
+        depthTest: false,
     });
     forceNodes.geometry.computeBoundingSphere();
     forceNodes.mesh = new THREE.Points(forceNodes.geometry, forceNodes.material);
