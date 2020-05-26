@@ -6,6 +6,7 @@ import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import postCssSimpleVars from 'postcss-simple-vars';
 import postCssNested from 'postcss-nested';
 import babel from 'rollup-plugin-babel';
+import image from 'rollup-plugin-image';
 import { name, homepage, version } from './package.json';
 
 const plugins = [
@@ -20,6 +21,7 @@ const plugins = [
   resolve(),
   commonJs(),
   json(),
+  image(),
 ];
 
 export default [

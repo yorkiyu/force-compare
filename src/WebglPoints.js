@@ -13,6 +13,7 @@ import {
 } from './Config';
 import { getBoxSizing } from './utils';
 import ForceWorkerString from 'web-worker:./ForceWorkerString.js';
+const nodeImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAXVBMVEVHcEzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMwFOyi9AAAAHnRSTlMA0BHa8CyIg/zFRKty/R9sFJnY3ip3wadLCi6KW5+O61oYAAABNklEQVRYw62X15bDIAxExyUGXBKXuDv6/8/Mw266nQDj+z5zDiCJEbDBtKjeNLHWcWN6tUxwYRxmo+UFbeZhtJSf205W6dqzhfygatmkVocf8jAP5CtBHn7Tp5n8JEu39adILIhOG/IyKcSKIinX9MdKrKmOK/qLOHD5cCgrcaJ6P0UijiRv91+4GhQvb5FG4kz0VA9hJh5kj5rMxYv83j+Bn0Fw6ywlnqj//q99Deq/+dCKNy0AjJ2/QTcCGIRgADAzBjMAwxgYYNKMgZ6wCMXiX0W3Wuo5g567QxGDhjNoEHMGMTRnoHkD+gj0JdLPSBcSXcp0M9HtTA8UfqTRQ5Ue6/THwn9t9OfKf+90wOAjDh2y+JjHB00+6tJhm4/7/MLBrzw7LF382scvnjusvjss327r/xU9OnbkMwnCfwAAAABJRU5ErkJggg==';
 let scene = null;
 let camera = null;
 let renderer = null;
@@ -67,28 +68,54 @@ function init({ props }) {
     initBasicMesh();
     installControls();
     start();
+    startRender();
 }
 
 function initWorker() {
-    console.log(ForceWorkerString);
     workerInstance = new ForceWorkerString();
 }
 
 function initBasicMesh() {
+    const color = new THREE.Color(0xffffff);
     forceNodes.geometry = new THREE.BufferGeometry();
     forceNodes.nodes = cloneDeep(data.nodes);
     forceNodes.positions = new Float32Array(data.nodes.length * 3);
-    forceNodes.scale = new Float32Array(data.nodes.length);
+    forceNodes.colors = new Float32Array(data.nodes.length * 3);
+    forceNodes.sizes = new Float32Array(data.nodes.length);
     forceNodes.nodes.forEach((e, i) => {
         forceNodes.positions[i * 3] = -9999;
         forceNodes.positions[i * 3 + 1] = -9999;
         forceNodes.positions[i * 3 + 2] = 0;
-        forceNodes.scale[i] = 1;
+        color.setStyle(getRandomColor(e.id));
+        color.toArray(forceNodes.colors, i * 3);
+        forceNodes.sizes[i] = radius;
     });
-    forceNodes.material = new THREE.PointsMaterial({color: 0x888888, size: radius *  2});
+    console.log(forceNodes);
+    // forceNodes.material = new THREE.PointsMaterial({vertexColors: true, size: radius *  2});
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
-    forceNodes.geometry.setAttribute('scale', new THREE.BufferAttribute(forceNodes.scale, 1));
-    forceNodes.geometry.attributes.position.needsUpdate = true
+    forceNodes.geometry.setAttribute('customColor', new THREE.BufferAttribute(forceNodes.colors, 3));
+    forceNodes.geometry.setAttribute('size', new THREE.BufferAttribute(forceNodes.sizes, 1));
+    forceNodes.geometry.attributes.position.needsUpdate = true;
+    
+    forceNodes.material = new THREE.ShaderMaterial( {
+        uniforms: {
+            size: {value: radius * 2},
+        },
+        // vertexShader: THREE.ShaderLib.points.vertexShader,
+        vertexShader: document.getElementById('vertexshader').textContent,
+        fragmentShader: document.getElementById('fragmentshader').textContent,
+        // fragmentShader: `
+        //     uniform vec3 color;
+        //     void main() {
+        //         vec2 xy = gl_PointCoord.xy - vec2(0.5);
+        //         float ll = length(xy);
+        //         gl_FragColor = vec4(color, step(ll, 0.5));
+        //     }
+        // `,
+        // blending: THREE.AdditiveBlending,
+        // depthTest: false,
+        transparent: true
+    });
     forceNodes.geometry.computeBoundingSphere();
     forceNodes.mesh = new THREE.Points(forceNodes.geometry, forceNodes.material);
     forceNodes.mesh.name = 'nodes';
@@ -159,7 +186,6 @@ function ticked() {
         forceNodes.positions[i * 3] = e.x;
         forceNodes.positions[i * 3 + 1] = e.y;
         forceNodes.positions[i * 3 + 2] = 0;
-        forceNodes.scale[i] = 1;
     });
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
     forceNodes.geometry.attributes.position.needsUpdate = true
@@ -175,8 +201,23 @@ function ticked() {
     forceLinks.geometry.setAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
     forceLinks.geometry.attributes.position.needsUpdate = true
     forceLinks.geometry.computeBoundingSphere();
-    renderer.render(scene, camera);
+    startRender();
 }
+
+
+function startRender() {
+    if (!rafId) {
+        rafId = requestAnimationFrame(render);
+    }
+}
+
+function render() {
+    rafId = null;
+    renderer.render(scene, camera);
+    controls && controls.update();
+    startRender();
+}
+
 
 function installControls () {
     controls = new MapControls(camera, renderer.domElement)

@@ -13,7 +13,7 @@ import {
     TriangleSegments
 } from './Config';
 import { getBoxSizing } from './utils';
-console.log('', ForceWorkerString);
+
 let scene = null;
 let camera = null;
 let renderer = null;
