@@ -1,5 +1,5 @@
 export const Extent = [0.01, 100];
-export const PathStrok = '#aaa';
+export const PathStrok = '#c0c0c0';
 export const ColorWhite = '#fff';
 export const Radius = 15;
 

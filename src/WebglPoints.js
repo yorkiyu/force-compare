@@ -88,32 +88,24 @@ function initBasicMesh() {
         forceNodes.positions[i * 3 + 2] = 0;
         color.setStyle(getRandomColor(e.id));
         color.toArray(forceNodes.colors, i * 3);
-        forceNodes.sizes[i] = radius;
+        forceNodes.sizes[i] = radius * 2;
     });
     console.log(forceNodes);
     // forceNodes.material = new THREE.PointsMaterial({vertexColors: true, size: radius *  2});
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
-    forceNodes.geometry.setAttribute('customColor', new THREE.BufferAttribute(forceNodes.colors, 3));
+    forceNodes.geometry.setAttribute('ca', new THREE.BufferAttribute(forceNodes.colors, 3));
     forceNodes.geometry.setAttribute('size', new THREE.BufferAttribute(forceNodes.sizes, 1));
     forceNodes.geometry.attributes.position.needsUpdate = true;
-    
+    forceNodes.texture = new THREE.TextureLoader().load(nodeImage);
+    forceNodes.texture.wrapS = THREE.RepeatWrapping;
+    forceNodes.texture.wrapT = THREE.RepeatWrapping; 
     forceNodes.material = new THREE.ShaderMaterial( {
         uniforms: {
-            size: {value: radius * 2},
+            color: { value: new THREE.Color( 0xffffff ) },
+            pointTexture: { value: forceNodes.texture }
         },
-        // vertexShader: THREE.ShaderLib.points.vertexShader,
         vertexShader: document.getElementById('vertexshader').textContent,
         fragmentShader: document.getElementById('fragmentshader').textContent,
-        // fragmentShader: `
-        //     uniform vec3 color;
-        //     void main() {
-        //         vec2 xy = gl_PointCoord.xy - vec2(0.5);
-        //         float ll = length(xy);
-        //         gl_FragColor = vec4(color, step(ll, 0.5));
-        //     }
-        // `,
-        // blending: THREE.AdditiveBlending,
-        // depthTest: false,
         transparent: true
     });
     forceNodes.geometry.computeBoundingSphere();
@@ -141,7 +133,7 @@ function initBasicMesh() {
     forceLinks.geometry.computeBoundingSphere()
     
     forceLinks.mesh = new THREE.LineSegments(forceLinks.geometry, forceLinks.material)
-    forceLinks.mesh.name = 'baseLines'
+    forceLinks.mesh.name = 'links'
     scene.add(forceLinks.mesh)
 }
 
@@ -182,6 +174,18 @@ function start() {
 }
 
 function ticked() {
+    forceLinks.links.forEach((e, i) => {
+        forceLinks.positions[i * 6] = e.source.x;
+        forceLinks.positions[i * 6 + 1] = e.source.y;
+        forceLinks.positions[i * 6 + 2] = 0;
+        forceLinks.positions[i * 6 + 3] = e.target.x;
+        forceLinks.positions[i * 6 + 4] = e.target.y;
+        forceLinks.positions[i * 6 + 5] = 0;
+    });
+    forceLinks.geometry.setAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
+    forceLinks.geometry.attributes.position.needsUpdate = true
+    forceLinks.geometry.computeBoundingSphere();
+    
     forceNodes.nodes.forEach((e, i) => {
         forceNodes.positions[i * 3] = e.x;
         forceNodes.positions[i * 3 + 1] = e.y;
@@ -190,17 +194,6 @@ function ticked() {
     forceNodes.geometry.setAttribute('position', new THREE.BufferAttribute(forceNodes.positions, 3));
     forceNodes.geometry.attributes.position.needsUpdate = true
     forceNodes.geometry.computeBoundingSphere();
-    forceLinks.links.forEach((e, i) => {
-        forceLinks.positions[i * 6] = e.source.x;
-        forceLinks.positions[i * 6 + 1] = e.source.y;
-        forceLinks.positions[i * 6 + 2] = -0.001;
-        forceLinks.positions[i * 6 + 3] = e.target.x;
-        forceLinks.positions[i * 6 + 4] = e.target.y;
-        forceLinks.positions[i * 6 + 5] = -0.001;
-    });
-    forceLinks.geometry.setAttribute('position', new THREE.BufferAttribute(forceLinks.positions, 3))
-    forceLinks.geometry.attributes.position.needsUpdate = true
-    forceLinks.geometry.computeBoundingSphere();
     startRender();
 }
 
