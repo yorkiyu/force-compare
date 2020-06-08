@@ -1,26 +1,11 @@
 const fs = require('fs')
 
-function getNodes (numbers) {
+const getNodes = (numbers) => Array(numbers).fill(0).map((v, i) => ({ id: String(i), name: String(i) }));
+const getLinks = (numbers) => {
   return Array(numbers).fill(0).map((v, i) => {
-    return {
-      id: i,
-      label: `节点${i}`
-    }
-  })
-}
-
-function getLinks (numbers) {
-  return Array(numbers).fill(0).map((v, i) => {
-    const info = {
-      source: Math.floor(Math.sqrt(i)),
-      target: i + 1
-    };
-    return {
-      ...info,
-      id: `${info.source}-${info.target}`,  
-      label: `${info.source}-${info.target}`,  
-    }
-  })
+    const info = { source: String(Math.floor(Math.sqrt(i))), target: String(i + 1) };
+    return { ...info, id: `${info.source}-${info.target}`}
+  });
 }
 
 fs.writeFileSync('../data/500.js', `window.data500 = ${JSON.stringify({
@@ -37,6 +22,12 @@ fs.writeFileSync('../data/5000.js', `window.data5000 = ${JSON.stringify({
   nodes: getNodes(5000),
   links: getLinks(5000 - 1)
 })}`)
+
+fs.writeFileSync('../data/1000.js', `window.data1000 = ${JSON.stringify({
+  nodes: getNodes(1000),
+  links: getLinks(1000 - 1)
+})}`)
+
 
 fs.writeFileSync('../data/10000.js', `window.data10000 = ${JSON.stringify({
   nodes: getNodes(10000),
